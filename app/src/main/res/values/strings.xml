@@ -3,4 +3,5 @@
     <string name="result_text_from_picture">Result Text From Picture :</string>
     <string name="take_the_picture">Take the Picture</string>
     <string name="upload_the_result">Upload the result</string>
+    <string name="edit_result">Edit Result</string>
 </resources>
