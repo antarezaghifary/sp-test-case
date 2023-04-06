@@ -1,5 +1,6 @@
 package com.samrez.sp_test_case.ui
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -13,6 +14,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -24,10 +27,13 @@ class PictureAddAndResultActivity : AppCompatActivity() {
     private lateinit var scannedBitmap: Bitmap
     private var bitmapState: Bitmap? = null
     private lateinit var textResult: String
+    private lateinit var fused: FusedLocationProviderClient
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPictureAddAndResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        fused = LocationServices.getFusedLocationProviderClient(this@PictureAddAndResultActivity)
 
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
@@ -145,6 +151,30 @@ class PictureAddAndResultActivity : AppCompatActivity() {
                 binding.btnEditResult.visibility = View.GONE
                 binding.tvLocation.visibility = View.GONE
             }
+        getLocation()
+    }
+
+    private fun getLocation() {
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        val location = fused.lastLocation
+        location.addOnSuccessListener {
+            if (it != null) {
+                val latitude: Double = it.latitude
+                val longitude: Double = it.longitude
+
+                binding.tvLocation.text = "Latitude : ${latitude}, Longitude : ${longitude}"
+            }
+        }
     }
 
     private fun imageFromBitmap(bitmap: Bitmap): InputImage {
@@ -172,7 +202,9 @@ class PictureAddAndResultActivity : AppCompatActivity() {
     companion object {
         private val REQUIRED_PERMISSIONS =
             arrayOf(
-                android.Manifest.permission.CAMERA
+                android.Manifest.permission.CAMERA,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
             )
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
