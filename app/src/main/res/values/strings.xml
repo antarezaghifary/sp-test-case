@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">sp-test-case</string>
+    <string name="result_text_from_picture">Result Text From Picture :</string>
+    <string name="take_the_picture">Take the Picture</string>
 </resources>
