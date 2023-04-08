@@ -4,13 +4,14 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import androidx.appcompat.app.AppCompatActivity
+import android.location.Location
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
@@ -138,20 +139,18 @@ class PictureAddAndResultActivity : AppCompatActivity() {
 
                 if (it.text == "") {
                     binding.btnEditResult.visibility = View.GONE
-                    binding.tvLocation.visibility = View.GONE
                     binding.tvResultCapture.text = "-"
                 } else {
                     binding.btnEditResult.visibility = View.VISIBLE
-                    binding.tvLocation.visibility = View.VISIBLE
                 }
+                binding.tvLocation.visibility = View.VISIBLE
+                getLocation()
             }
             .addOnFailureListener { e ->
                 e.printStackTrace()
                 Toast.makeText(this, "Failed detect text", Toast.LENGTH_SHORT).show()
                 binding.btnEditResult.visibility = View.GONE
-                binding.tvLocation.visibility = View.GONE
             }
-        getLocation()
     }
 
     private fun getLocation() {
@@ -172,7 +171,17 @@ class PictureAddAndResultActivity : AppCompatActivity() {
                 val latitude: Double = it.latitude
                 val longitude: Double = it.longitude
 
-                binding.tvLocation.text = "Latitude : ${latitude}, Longitude : ${longitude}"
+                val latitudePlaza: Double = -7.1555178
+                val longitudePlaza: Double = 107.2298156
+
+                val results = FloatArray(1)
+                Location.distanceBetween(latitude,longitude,latitudePlaza,longitudePlaza,results)
+                val distance = results[0]
+                val kilometer: Int = (distance/1000).toInt()
+
+                val duration: Double = (kilometer/70).toDouble()
+
+                binding.tvLocation.text = "Jarak dari tempat anda ke Plaza Indonesia Jakarta : ${kilometer} Km, Waktu yang dibutuhkan ${duration} jam"
             }
         }
     }
